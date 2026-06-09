@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rediver Helm Charts</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 720px; margin: 8vh auto; padding: 0 1.5rem; line-height: 1.6;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+    p.sub { color: #888; margin-top: 0; }
+    pre {
+      background: #1118; color: #eee; padding: 1rem 1.25rem; border-radius: 10px;
+      overflow-x: auto; font-size: 0.9rem;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    a { color: #3b82f6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #8884; }
+    footer { margin-top: 3rem; color: #888; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>Rediver Helm Charts</h1>
+  <p class="sub">Helm repository for Rediver — <code>helm.rediver.ai</code></p>
+
+  <pre><code>helm repo add rediver https://helm.rediver.ai
+helm repo update
+helm search repo rediver</code></pre>
+
+  <h2>Charts</h2>
+  <table>
+    <thead><tr><th>Chart</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>connector</code></td>
+        <td>Outbound agent bridging external platforms (GitLab, etc.) with the Rediver backend.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Install the connector</h2>
+  <pre><code>helm install my-connector rediver/connector \
+  --namespace rediver --create-namespace \
+  --set rediver.token=&lt;cluster-token&gt;</code></pre>
+
+  <footer>
+    Source: <a href="https://github.com/redivers/charts">github.com/redivers/charts</a>
+  </footer>
+</body>
+</html>
