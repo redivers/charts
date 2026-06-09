@@ -47,21 +47,11 @@ config:
   # Job queue size. 0/empty = auto: workers*10. Maps to QUEUE_SIZE.
   queueSize: ""
 
-# Working directory for clones/archives. Mounted from the `persistence` volume
-# below. Maps to DATA_DIR. HOME is also set here so git writes stay on the volume.
+# Working directory for clones/archives, backed by an ephemeral emptyDir.
+# Each sync job clones into a temp subdir and removes it when done, so no
+# persistent volume is needed. Maps to DATA_DIR. HOME is also set here so git
+# writes stay on the writable volume (required for the non-root container).
 dataDir: /data/rediver-connector
-
-# Storage for the data directory.
-persistence:
-  # false = ephemeral emptyDir (cleared on pod restart; fine for a stateless agent).
-  # true  = provision a PersistentVolumeClaim.
-  enabled: false
-  # Used only when an existing claim should be reused.
-  existingClaim: ""
-  storageClass: ""
-  accessModes:
-    - ReadWriteOnce
-  size: 1Gi
 
 # Extra environment variables passed verbatim to the container.
 # Each item is a standard core/v1 EnvVar.
@@ -70,7 +60,7 @@ extraEnv: []
 #   value: http://proxy.internal:3128
 
 # Deployment update strategy. Recreate avoids two agents registering at once
-# during rollouts (relevant when persistence is enabled with RWO volumes).
+# during rollouts.
 strategy:
   type: Recreate
 

@@ -86,13 +86,10 @@ spec:
               mountPath: /tmp
             {{- end }}
       volumes:
+        # DATA_DIR is ephemeral scratch space: each sync job clones into a temp
+        # subdir and deletes it when done, so nothing needs to survive a restart.
         - name: data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "connector.fullname" .) }}
-          {{- else }}
           emptyDir: {}
-          {{- end }}
         {{- if .Values.securityContext.readOnlyRootFilesystem }}
         - name: tmp
           emptyDir: {}

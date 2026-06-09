@@ -59,11 +59,7 @@ helm install my-connector rediver/connector \
 | `existingSecret` | `""` | Name of a pre-created Secret with `REDIVER_TOKEN` (+ optional `GITLAB_TOKEN`). |
 | `config.workers` | `""` | Worker pool size (`WORKERS`). Empty = auto. |
 | `config.queueSize` | `""` | Job queue size (`QUEUE_SIZE`). Empty = auto. |
-| `dataDir` | `/data/rediver-connector` | Clone/archive working dir (`DATA_DIR`). |
-| `persistence.enabled` | `false` | Use a PVC for the data dir instead of `emptyDir`. |
-| `persistence.size` | `1Gi` | PVC size when enabled. |
-| `persistence.storageClass` | `""` | PVC storage class. |
-| `persistence.existingClaim` | `""` | Reuse an existing PVC. |
+| `dataDir` | `/data/rediver-connector` | Clone/archive working dir (`DATA_DIR`), backed by an ephemeral `emptyDir`. |
 | `extraEnv` | `[]` | Extra environment variables (e.g. `HTTP_PROXY`). |
 | `resources` | requests 50m/64Mi, limit 256Mi | Container resources. |
 | `serviceAccount.create` | `true` | Create a dedicated ServiceAccount. |
