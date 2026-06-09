@@ -3,6 +3,30 @@ entries:
   connector:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-06-09T15:17:26.56678848Z"
+    description: Rediver Connector — lightweight outbound agent that bridges external
+      platforms (GitLab, etc.) with the Rediver backend.
+    digest: e47329b2084cf4c3ac573c65924808fc2bbd263a00bcd2511582ffed16f850b3
+    home: https://github.com/redivers/connector
+    icon: https://avatars.githubusercontent.com/u/291072917
+    keywords:
+    - rediver
+    - connector
+    - gitlab
+    - agent
+    - sync
+    maintainers:
+    - name: Rediver
+      url: https://rediver.ai
+    name: connector
+    sources:
+    - https://github.com/redivers/connector
+    type: application
+    urls:
+    - https://github.com/redivers/charts/releases/download/connector-0.2.0/connector-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-09T14:25:10.826716677Z"
     description: Rediver Connector — lightweight outbound agent that bridges external
       platforms (GitLab, etc.) with the Rediver backend.
@@ -25,4 +49,4 @@ entries:
     urls:
     - https://github.com/redivers/charts/releases/download/connector-0.1.0/connector-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-09T14:25:10.82672342Z"
+generated: "2026-06-09T15:17:26.566799566Z"
