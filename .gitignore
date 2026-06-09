@@ -1,0 +1,9 @@
+# Helm packaging artifacts
+*.tgz
+.cr-release-packages/
+.cr-index/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

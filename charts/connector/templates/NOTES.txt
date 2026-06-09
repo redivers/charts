@@ -1,0 +1,19 @@
+Rediver Connector has been deployed.
+
+Release:   {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+Image:     {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+Backend:   {{ .Values.rediver.url }}
+
+The connector is an outbound agent — it exposes no Service or inbound ports.
+Verify it registered with the backend by watching the logs:
+
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} -f
+
+{{- if not .Values.existingSecret }}
+{{- if not .Values.rediver.token }}
+
+WARNING: rediver.token was empty. Set it with --set rediver.token=<cluster-token>
+or point existingSecret at a Secret containing REDIVER_TOKEN.
+{{- end }}
+{{- end }}

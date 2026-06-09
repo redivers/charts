@@ -1,0 +1,117 @@
+# Default values for the Rediver Connector chart.
+# This is a YAML-formatted file. Override any value with `--set` or a custom values file.
+
+# The connector is a singleton outbound agent: each running pod registers itself
+# as one connector with the Rediver backend. Run a single replica per cluster
+# token unless you intend to register multiple distinct connectors.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/redivers/connector
+  # Overrides the image tag. Defaults to the chart appVersion when empty.
+  # Use "main" to track the latest dev build, or a pinned version like "1.0.0".
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Secrets for pulling the image. The GHCR package is public, so this is usually empty.
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Rediver backend connection.
+rediver:
+  # Rediver API URL (maps to REDIVER_URL).
+  url: https://api.rediver.ai
+  # Cluster token (maps to REDIVER_TOKEN). REQUIRED.
+  # Provide it here, or reference a pre-existing secret via `existingSecret` below.
+  token: ""
+
+# GitLab connector-managed-token mode. Only needed when an integration uses
+# token_mode=connector (the PAT lives on the connector). Otherwise leave empty.
+gitlab:
+  # Personal access token with read_api + read_repository scope (maps to GITLAB_TOKEN).
+  token: ""
+  # Base URL of a self-managed GitLab instance (maps to GITLAB_URL). Optional.
+  url: ""
+
+# Use a pre-existing Kubernetes Secret instead of letting the chart create one.
+# The secret must contain keys: REDIVER_TOKEN (required), GITLAB_TOKEN (optional).
+# When set, rediver.token and gitlab.token above are ignored.
+existingSecret: ""
+
+# Tuning knobs (all optional; empty = use the connector's built-in defaults).
+config:
+  # Worker pool size. 0/empty = auto: min(CPU*2, 8). Maps to WORKERS.
+  workers: ""
+  # Job queue size. 0/empty = auto: workers*10. Maps to QUEUE_SIZE.
+  queueSize: ""
+
+# Working directory for clones/archives. Mounted from the `persistence` volume
+# below. Maps to DATA_DIR. HOME is also set here so git writes stay on the volume.
+dataDir: /data/rediver-connector
+
+# Storage for the data directory.
+persistence:
+  # false = ephemeral emptyDir (cleared on pod restart; fine for a stateless agent).
+  # true  = provision a PersistentVolumeClaim.
+  enabled: false
+  # Used only when an existing claim should be reused.
+  existingClaim: ""
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+
+# Extra environment variables passed verbatim to the container.
+# Each item is a standard core/v1 EnvVar.
+extraEnv: []
+# - name: HTTP_PROXY
+#   value: http://proxy.internal:3128
+
+# Deployment update strategy. Recreate avoids two agents registering at once
+# during rollouts (relevant when persistence is enabled with RWO volumes).
+strategy:
+  type: Recreate
+
+serviceAccount:
+  # Create a dedicated ServiceAccount.
+  create: true
+  # Name override. Generated from the release name when empty.
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: false
+
+# Pod-level security context.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  # The connector only reads from external sources but clones into the mounted
+  # data volume; the root FS can stay read-only when a writable /tmp is available.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Extra pod annotations/labels.
+podAnnotations: {}
+podLabels: {}
