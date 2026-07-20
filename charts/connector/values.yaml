@@ -9,7 +9,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/redivers/connector
   # Overrides the image tag. Defaults to the chart appVersion when empty.
-  # Use "main" to track the latest dev build, or a pinned version like "1.0.0".
+  # Use "main" to track the latest dev build, or a pinned version like "2.0.0".
   tag: ""
   pullPolicy: IfNotPresent
 
@@ -27,31 +27,37 @@ rediver:
   # Provide it here, or reference a pre-existing secret via `existingSecret` below.
   token: ""
 
-# GitLab connector-managed-token mode. Only needed when an integration uses
-# token_mode=connector (the PAT lives on the connector). Otherwise leave empty.
+# Optional connector-local GitLab credential. Leave both values empty to use
+# the credential supplied by Rediver. When one local value is set, both are
+# required.
 gitlab:
   # Personal access token with read_api + read_repository scope (maps to GITLAB_TOKEN).
   token: ""
-  # Base URL of a self-managed GitLab instance (maps to GITLAB_URL). Optional.
+  # GitLab base URL (maps to GITLAB_URL).
   url: ""
+  # Projects fetched per GitLab API page (maps to GITLAB_PROJECTS_PER_PAGE).
+  # Must be between 1 and 100.
+  projectsPerPage: 50
 
 # Use a pre-existing Kubernetes Secret instead of letting the chart create one.
-# The secret must contain keys: REDIVER_TOKEN (required), GITLAB_TOKEN (optional).
+# The secret must contain REDIVER_TOKEN. Add GITLAB_TOKEN when gitlab.url is set
+# to use connector-local GitLab credentials.
 # When set, rediver.token and gitlab.token above are ignored.
 existingSecret: ""
 
-# Tuning knobs (all optional; empty = use the connector's built-in defaults).
+# Connector runtime configuration.
 config:
-  # Worker pool size. 0/empty = auto: min(CPU*2, 8). Maps to WORKERS.
-  workers: ""
-  # Job queue size. 0/empty = auto: workers*10. Maps to QUEUE_SIZE.
-  queueSize: ""
-
-# Working directory for clones/archives, backed by an ephemeral emptyDir.
-# Each sync job clones into a temp subdir and removes it when done, so no
-# persistent volume is needed. Maps to DATA_DIR. HOME is also set here so git
-# writes stay on the writable volume (required for the non-root container).
-dataDir: /data/rediver-connector
+  # Maximum concurrent job executions (maps to THREADS).
+  # Empty = connector default: min(CPU*2, 8).
+  threads: ""
+  # Minimum structured log level (maps to LOG_LEVEL).
+  logLevel: info
+  # Grace period before active handlers are interrupted during shutdown
+  # (maps to SHUTDOWN_GRACE_SECONDS).
+  shutdownGraceSeconds: 30
+  # Encrypt source artifacts with AES-256-GCM before upload
+  # (maps to ARTIFACT_ENCRYPTION).
+  artifactEncryption: false
 
 # Extra environment variables passed verbatim to the container.
 # Each item is a standard core/v1 EnvVar.
@@ -75,17 +81,17 @@ serviceAccount:
 # Pod-level security context.
 podSecurityContext:
   runAsNonRoot: true
-  runAsUser: 65532
-  runAsGroup: 65532
-  fsGroup: 65532
+  # The published image runs as connector UID/GID 999. Do not override
+  # runAsUser/runAsGroup; fsGroup keeps conditional emptyDir mounts writable.
+  fsGroup: 999
   seccompProfile:
     type: RuntimeDefault
 
 # Container-level security context.
 securityContext:
   allowPrivilegeEscalation: false
-  # The connector only reads from external sources but clones into the mounted
-  # data volume; the root FS can stay read-only when a writable /tmp is available.
+  # When enabled, the chart mounts writable emptyDir volumes at the image's
+  # HOME (/home/connector) and /tmp.
   readOnlyRootFilesystem: false
   capabilities:
     drop:

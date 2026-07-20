@@ -1,3 +1,4 @@
+{{- include "connector.validateValues" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,12 +40,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          args:
-            - --url
-            - {{ .Values.rediver.url | quote }}
-            - --data-dir
-            - {{ .Values.dataDir | quote }}
           env:
+            - name: REDIVER_URL
+              value: {{ .Values.rediver.url | quote }}
             - name: REDIVER_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -62,38 +60,37 @@ spec:
             - name: GITLAB_URL
               value: {{ .Values.gitlab.url | quote }}
             {{- end }}
-            {{- if .Values.config.workers }}
-            - name: WORKERS
-              value: {{ .Values.config.workers | quote }}
+            - name: GITLAB_PROJECTS_PER_PAGE
+              value: {{ .Values.gitlab.projectsPerPage | quote }}
+            {{- if .Values.config.threads }}
+            - name: THREADS
+              value: {{ .Values.config.threads | quote }}
             {{- end }}
-            {{- if .Values.config.queueSize }}
-            - name: QUEUE_SIZE
-              value: {{ .Values.config.queueSize | quote }}
-            {{- end }}
-            # Keep git's HOME on the writable data volume so it works as non-root.
-            - name: HOME
-              value: {{ .Values.dataDir | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.config.logLevel | quote }}
+            - name: SHUTDOWN_GRACE_SECONDS
+              value: {{ .Values.config.shutdownGraceSeconds | quote }}
+            - name: ARTIFACT_ENCRYPTION
+              value: {{ .Values.config.artifactEncryption | quote }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.securityContext.readOnlyRootFilesystem }}
           volumeMounts:
-            - name: data
-              mountPath: {{ .Values.dataDir | quote }}
-            {{- if .Values.securityContext.readOnlyRootFilesystem }}
+            - name: home
+              mountPath: /home/connector
             - name: tmp
               mountPath: /tmp
-            {{- end }}
+          {{- end }}
+      {{- if .Values.securityContext.readOnlyRootFilesystem }}
       volumes:
-        # DATA_DIR is ephemeral scratch space: each sync job clones into a temp
-        # subdir and deletes it when done, so nothing needs to survive a restart.
-        - name: data
+        - name: home
           emptyDir: {}
-        {{- if .Values.securityContext.readOnlyRootFilesystem }}
         - name: tmp
           emptyDir: {}
-        {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
