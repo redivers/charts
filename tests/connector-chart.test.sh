@@ -41,7 +41,7 @@ default_manifest="$tmp_dir/default.yaml"
 helm template test "$chart" \
   --set-string rediver.token=test-token >"$default_manifest"
 
-assert_contains "$default_manifest" 'image: "ghcr.io/redivers/connector:2.0.0"'
+assert_contains "$default_manifest" 'image: "ghcr.io/redivers/connector:2.0.1"'
 for name in \
   REDIVER_URL \
   REDIVER_TOKEN \
@@ -54,8 +54,8 @@ done
 for removed in --data-dir DATA_DIR WORKERS QUEUE_SIZE; do
   assert_not_contains "$default_manifest" "$removed"
 done
-assert_not_contains "$default_manifest" 'runAsUser:'
-assert_not_contains "$default_manifest" 'runAsGroup:'
+assert_contains "$default_manifest" 'runAsUser: 999'
+assert_contains "$default_manifest" 'runAsGroup: 999'
 assert_contains "$default_manifest" 'fsGroup: 999'
 
 custom_manifest="$tmp_dir/custom.yaml"
@@ -128,8 +128,8 @@ assert_render_fails invalid-project-page-size \
 
 chart_metadata="$chart/Chart.yaml"
 chart_readme="$chart/README.md"
-assert_contains "$chart_metadata" 'version: 0.3.0'
-assert_contains "$chart_metadata" 'appVersion: "2.0.0"'
+assert_contains "$chart_metadata" 'version: 0.3.1'
+assert_contains "$chart_metadata" 'appVersion: "2.0.1"'
 for documented_value in \
   '`config.threads`' \
   '`config.logLevel`' \

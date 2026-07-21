@@ -2,7 +2,7 @@
 
 Deploys [Rediver Connector](https://github.com/redivers/connector), the
 outbound agent that bridges Git providers with the Rediver backend. Chart
-`0.3.0` deploys connector `2.0.0` by default.
+`0.3.1` deploys connector `2.0.1` by default.
 
 The connector opens no inbound port, so this chart has no Service or Ingress.
 Keep one replica per Rediver cluster token unless multiple distinct connector
@@ -97,7 +97,7 @@ format before upload.
 |---|---|---|---|---|
 | `replicaCount` | — | `1` | No | Connector pod count. Keep one replica per cluster token. |
 | `image.repository` | — | `ghcr.io/redivers/connector` | No | Container image repository. |
-| `image.tag` | — | `""` → chart `appVersion` (`2.0.0`) | No | Explicit image tag override. Use `main` only for development deployments. |
+| `image.tag` | — | `""` → chart `appVersion` (`2.0.1`) | No | Explicit image tag override. Use `main` only for development deployments. |
 | `image.pullPolicy` | — | `IfNotPresent` | No | Kubernetes image pull policy. |
 | `imagePullSecrets` | — | `[]` | No | Image pull Secrets; the published GHCR image is public. |
 | `rediver.url` | `REDIVER_URL` | `https://api.rediver.ai` | Yes, default provided | Non-empty Rediver API base URL. |
