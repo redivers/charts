@@ -81,8 +81,13 @@ serviceAccount:
 # Pod-level security context.
 podSecurityContext:
   runAsNonRoot: true
-  # The published image runs as connector UID/GID 999. Do not override
-  # runAsUser/runAsGroup; fsGroup keeps conditional emptyDir mounts writable.
+  # The image's USER is the connector account (UID/GID 999). runAsNonRoot
+  # enforcement can only verify a *numeric* user, so runAsUser/runAsGroup must
+  # be set explicitly here — a non-numeric image USER makes the kubelet fail
+  # with CreateContainerConfigError. fsGroup keeps conditional emptyDir mounts
+  # writable.
+  runAsUser: 999
+  runAsGroup: 999
   fsGroup: 999
   seccompProfile:
     type: RuntimeDefault
