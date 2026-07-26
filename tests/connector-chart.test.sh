@@ -41,7 +41,7 @@ default_manifest="$tmp_dir/default.yaml"
 helm template test "$chart" \
   --set-string rediver.token=test-token >"$default_manifest"
 
-assert_contains "$default_manifest" 'image: "ghcr.io/redivers/connector:2.0.1"'
+assert_contains "$default_manifest" 'image: "ghcr.io/redivers/connector:2.0.3"'
 for name in \
   REDIVER_URL \
   REDIVER_TOKEN \
@@ -128,8 +128,8 @@ assert_render_fails invalid-project-page-size \
 
 chart_metadata="$chart/Chart.yaml"
 chart_readme="$chart/README.md"
-assert_contains "$chart_metadata" 'version: 0.3.1'
-assert_contains "$chart_metadata" 'appVersion: "2.0.1"'
+assert_contains "$chart_metadata" 'version: 0.3.2'
+assert_contains "$chart_metadata" 'appVersion: "2.0.3"'
 for documented_value in \
   '`config.threads`' \
   '`config.logLevel`' \
