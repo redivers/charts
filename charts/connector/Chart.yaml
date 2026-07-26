@@ -3,9 +3,9 @@ name: connector
 description: Rediver Connector — lightweight outbound agent that bridges external platforms (GitLab, etc.) with the Rediver backend.
 type: application
 # version: chart version, bumped on every chart change (SemVer).
-version: 0.3.1
+version: 0.3.2
 # appVersion: version of the connector application this chart deploys.
-appVersion: "2.0.1"
+appVersion: "2.0.3"
 home: https://github.com/redivers/connector
 icon: https://avatars.githubusercontent.com/u/291072917
 sources:
